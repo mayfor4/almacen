@@ -1,56 +1,57 @@
 import flet as ft
-from src.components.custom_button import CustomButton
-from src.utils.helpers import generate_greeting
+from src.pages.form_page import formulario
 
-class HomePage:
-    def __init__(self, page: ft.Page):
-        self.page = page
-        self.view = self._build_view()
+
+def home_page(page: ft.Page):
+
     
-    def _build_view(self):
-        # Texto principal
-        self.greeting_text = ft.Text(
-            value=generate_greeting("Estudiante"),
-            size=20,
-            text_align=ft.TextAlign.CENTER,
-            weight=ft.FontWeight.BOLD
+    def abrir_formulario(career):
+        page.clean()
+        formulario(page, career)
+
+    
+    def salir(e):
+        from src.pages.login_page import login_page 
+        page.clean()
+        login_page(page)
+
+    page.title = "Solicitud de Materiales"
+    page.scroll = "adaptive"
+
+    
+    career = [
+        ("Química", ft.Icons.SCIENCE),
+        ("Mecatrónica", ft.Icons.MISCELLANEOUS_SERVICES),
+        ("Tecnologías de la Información", ft.Icons.COMPUTER),
+        ("Farmacéutica", ft.Icons.BIOTECH)
+    ]
+
+   
+    cards = []
+    for career, icono in career:
+        card = ft.Card(
+            content=ft.Container(
+                content=ft.Column([
+                    ft.Icon(icono, size=50, color=ft.Colors.BLUE),
+                    ft.Text(career, size=18, weight=ft.FontWeight.BOLD)
+                ], alignment=ft.MainAxisAlignment.CENTER,
+                   horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                padding=20,
+                on_click=lambda e, c=career: abrir_formulario(c)
+            ),
+            width=200,
+            height=150
         )
-        
-        # Imagen placeholder (usa tu asset)
-        image = ft.Image(
-            src="images/mi-imagen.png",
-            width=100,
-            height=100,
-            fit=ft.ImageFit.CONTAIN
-        )
-        
-        # Botón custom
-        def on_button_click(e):
-            self.greeting_text.value = generate_greeting("Usuario Interactivo")
-            self.page.update()
-        
-        button = CustomButton(
-            text="¡Cambiar Saludo!",
-            on_click=on_button_click,
-            width=200
-        )
-        
-        # Contenedor principal
-        return ft.Column(
-            [
-                ft.Container(
-                    content=image,
-                    alignment=ft.alignment.center,
-                    margin=10
-                ),
-                self.greeting_text,
-                ft.Container(
-                    content=button,
-                    alignment=ft.alignment.center,
-                    margin=10
-                )
-            ],
-            spacing=20,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            scroll=ft.ScrollMode.AUTO
-        )
+        cards.append(card)
+
+   
+    page.add(
+    ft.Column([
+        ft.Text("Solicitud de Materiales", size=30, weight=ft.FontWeight.BOLD),
+        ft.Row(cards, alignment=ft.MainAxisAlignment.CENTER, wrap=True, spacing=20),
+        ft.OutlinedButton("Salir", on_click=salir)
+    ],
+    alignment=ft.MainAxisAlignment.CENTER,
+    horizontal_alignment=ft.CrossAxisAlignment.CENTER) 
+)
+
