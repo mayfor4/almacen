@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: almacen
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: "flet run main.py --port $PORT"

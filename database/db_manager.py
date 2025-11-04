@@ -1,9 +1,9 @@
+# db_manager.py
 import sqlite3
-import os
-
 from pathlib import Path
 
-DB_PATH = Path("C:/Users/diego/OneDrive/Documentos/endcuatri/goyo/almacen/solicitudes.db")
+# Ruta relativa al proyecto: archivo 'solicitudes.db' estará en la raíz del proyecto
+DB_PATH = Path(__file__).parent.parent / "solicitudes.db"
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -25,29 +25,46 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE,
         password TEXT,
-        rol TEXT  -- "estudiante" o "admin"
+        rol TEXT CHECK(rol IN ('estudiante', 'admin'))  -- SOLO permite estos dos valores
     )
     """)
+    
+    # Insertar usuarios por defecto
+    insertar_usuario_default(cursor, "diego", "123", "estudiante")
+    insertar_usuario_default(cursor, "dani", "123", "admin")
+    
     conn.commit()
     conn.close()
 
-def insertar_solicitud( nombre, expediente,carrera, material,):
+def insertar_usuario_default(cursor, username, password, rol):
+    """Inserta usuario por defecto si no existe"""
+    try:
+        cursor.execute("INSERT INTO usuarios (username, password, rol) VALUES (?, ?, ?)",
+                      (username, password, rol))
+        print(f"Usuario {username} agregado correctamente")
+    except sqlite3.IntegrityError:
+        print(f"Usuario {username} ya existe")
+
+def insertar_solicitud(nombre, expediente, carrera, material):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO solicitudes (nombre, expediente, carrera, material) VALUES (?, ?, ?, ?)",
-                   ( nombre, expediente,carrera, material,))
+                   (nombre, expediente, carrera, material))
     conn.commit()
     conn.close()
-
-   
 
 def agregar_usuario(username, password, rol):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO usuarios (username, password, rol) VALUES (?, ?, ?)",
-                   (username, password, rol))
-    conn.commit()
-    conn.close()
+    try:
+        cursor.execute("INSERT INTO usuarios (username, password, rol) VALUES (?, ?, ?)",
+                      (username, password, rol))
+        conn.commit()
+        print("Usuario agregado correctamente")
+    except sqlite3.IntegrityError:
+        print("Error: El usuario ya existe")
+    finally:
+        conn.close()
 
 def validar_usuario(username, password):
     conn = sqlite3.connect(DB_PATH)
@@ -58,3 +75,10 @@ def validar_usuario(username, password):
     if result:
         return result[0]  # Devuelve el rol
     return None
+
+# Para probar la base de datos
+if __name__ == "__main__":
+    init_db()
+    print("Base de datos inicializada con usuarios por defecto:")
+    print("Usuario: diego, Contraseña: 123, Rol: estudiante")
+    print("Usuario: dani, Contraseña: 123, Rol: admin")
