@@ -1,17 +1,9 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[project]
-name = "mi_proyecto_flet"
+[tool.poetry]
+name = "mi-proyecto-flet"
 version = "0.1.0"
-description = "Proyecto universitario PWA en Flet"
-dependencies = [
-    "flet >= 0.24.0",
-]
+description = ""
+authors = ["tu_nombre <tu@email.com>"]
 
-[tool.hatch.build.targets.wheel]
-packages = ["src"]
-
-[tool.flet]
-web-renderer = "html"  # O "canvaskit" para mejor rendimiento
+[tool.poetry.dependencies]
+python = ">=3.9"
+flet = "^0.28.0"
