@@ -1,4 +1,6 @@
+import os
 import flet as ft
+
 from database.db_manager import init_db
 from src.pages.login_page import login_page
 
@@ -10,3 +12,4 @@ def main(page: ft.Page):
     login_page(page)
 
 ft.app(target=main)
+#ft.app(target=main, view=ft.WEB_BROWSER, port=int(os.environ.get("PORT", 8080)))
